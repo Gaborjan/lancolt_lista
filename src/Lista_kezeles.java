@@ -60,7 +60,8 @@ public class Lista_kezeles {
 	static final String teszt_file_nev="teszt_adatok.csv";
 	static int nev_elso = NULL; // A lista üres
 	static int fiz_elso = NULL; // A lista üres
-	static int ures_elso = 0; // Az első üres hely
+	static int ures_elso_n = 0; // Az első üres hely nésor szerint
+	static int ures_elso_f = 0; // Az első üres hely fizetés szerint
 	
 	
 		
@@ -74,125 +75,125 @@ public static void main(String[] args) {
 	link_nev[MAXADAT-1]=NULL;
 	link_fiz[MAXADAT-1]= NULL;
 	teszt_adat_betolt();
-		do {
-			menuP=Kellekek.egyszeruMenu("Főmenü",FOMENUPONTOK, 4);
-			switch (menuP) {
-				case 1: //Főmenü/Fájlműveletek
-					{
-						do {
-   						menuP=Kellekek.egyszeruMenu(Kellekek.ballevag(FOMENUPONTOK[0],3),FAJLMUVELETEK, 5);
-   						switch (menuP) {
-   							case 1: //Fájlműveletek/Tesztadatok betöltése
-   							{
-   								teszt_adat_betolt();
-   								menuP=99;
-   								break;
-   							} // Fájműveletek/Tesztadatok betöltése case ág
-   							case 2: //Fájlműveletek/Lista mentése fájlba
-   							{
-   								Kellekek.tajUzenet("Fájlműveletek/"+FAJLMUVELETEK[1], true);
-   								menuP=99;
-   								break;
-   							} // //Fájlműveletek/Lista mentése fájlba case ág
-   							case 3: //Fájlműveletek/Betöltés fájlból listába
-   							{
-   								Kellekek.tajUzenet("Fájlműveletek/"+FAJLMUVELETEK[2], true);
-   								menuP=99;
-   								break;
-   							} // Fájműveletek/Lista betöltése fájlból case ág
-   							case 4: //Fájlműveletek/Drmonstrációs üzemmód
-   							{
-   								Kellekek.tajUzenet("Fájlműveletek/"+FAJLMUVELETEK[3], true);
-   								menuP=99;
-   								break;
-   							} // Fájműveletek/Demonstrációs üzemmód case ág
-   						}
-						} while (menuP!=0); // FÖMENÜ/Fájlműveletek almenü
-						menuP=99;
-						break;
-					} // Főmenü/Fájlműveletek case ág
-				case 2: 
-				{
-					do {
-						menuP=Kellekek.egyszeruMenu(Kellekek.ballevag(FOMENUPONTOK[1],3),KARBANTARTAS, 4);
-						switch (menuP) {
-							case 1: //Karbantartás/Lista bővítése
-							{
-								Kellekek.tajUzenet("Karbantartás/"+KARBANTARTAS[0], true);
-								menuP=99;
-								break;
-							} // Karbantartás/Lista bővítése case ág
-							case 2: //Karbantatás/Törlés a listáról
-							{
-								Kellekek.tajUzenet("Karbantartás/"+KARBANTARTAS[1], true);
-								menuP=99;
-								break;
-							} // Karbantartás/Lista bővítése case ág
-							case 3: //Karbantartás/Keresés a listában
-							{
-								Kellekek.tajUzenet("Karbantartás/"+KARBANTARTAS[2], true);
-								menuP=99;
-								break;
-							} // Karbantartás/Keresés a listában
-							case 4: //Tartalék
-							{
+	do {
+	   menuP=Kellekek.egyszeruMenu("Főmenü",FOMENUPONTOK, 4);
+	   switch (menuP) {
+	   case 1: //Főmenü/Fájlműveletek
+	   {
+	      do {
+	         menuP=Kellekek.egyszeruMenu(Kellekek.ballevag(FOMENUPONTOK[0],3),FAJLMUVELETEK, 5);
+	         switch (menuP) {
+	         case 1: //Fájlműveletek/Tesztadatok betöltése
+	         {
+	            teszt_adat_betolt();
+	            menuP=99;
+	            break;
+	         } // Fájműveletek/Tesztadatok betöltése case ág
+	         case 2: //Fájlműveletek/Lista mentése fájlba
+	         {
+	            Kellekek.tajUzenet("Fájlműveletek/"+FAJLMUVELETEK[1], true);
+	            menuP=99;
+	            break;
+	         } // //Fájlműveletek/Lista mentése fájlba case ág
+	         case 3: //Fájlműveletek/Betöltés fájlból listába
+	         {
+	            Kellekek.tajUzenet("Fájlműveletek/"+FAJLMUVELETEK[2], true);
+	            menuP=99;
+	            break;
+	         } // Fájműveletek/Lista betöltése fájlból case ág
+	         case 4: //Fájlműveletek/Drmonstrációs üzemmód
+	         {
+	            Kellekek.tajUzenet("Fájlműveletek/"+FAJLMUVELETEK[3], true);
+	            menuP=99;
+	            break;
+	         } // Fájműveletek/Demonstrációs üzemmód case ág
+	         }
+	      } while (menuP!=0); // FÖMENÜ/Fájlműveletek almenü
+	      menuP=99;
+	      break;
+	   } // Főmenü/Fájlműveletek case ág
+	   case 2: 
+	   {
+	      do {
+	         menuP=Kellekek.egyszeruMenu(Kellekek.ballevag(FOMENUPONTOK[1],3),KARBANTARTAS, 4);
+	         switch (menuP) {
+	         case 1: //Karbantartás/Lista bővítése
+	         {
+	            Kellekek.tajUzenet("Karbantartás/"+KARBANTARTAS[0], true);
+	            menuP=99;
+	            break;
+	         } // Karbantartás/Lista bővítése case ág
+	         case 2: //Karbantatás/Törlés a listáról
+	         {
+	            Kellekek.tajUzenet("Karbantartás/"+KARBANTARTAS[1], true);
+	            menuP=99;
+	            break;
+	         } // Karbantartás/Lista bővítése case ág
+	         case 3: //Karbantartás/Keresés a listában
+	         {
+	            Kellekek.tajUzenet("Karbantartás/"+KARBANTARTAS[2], true);
+	            menuP=99;
+	            break;
+	         } // Karbantartás/Keresés a listában
+	         case 4: //Tartalék
+	         {
 
-								menuP=99;
-								break;
-							} // Tartalék
-						}
-					} while (menuP!=0); // FÖMENÜ/Karbantartás case ág
-					menuP=99;
-					break;
-				} // Főmenü/Karbantartás case ág
-				case 3: //Fömenü/Lekérdezések 
-				{
-					do {
-						menuP=Kellekek.egyszeruMenu(Kellekek.ballevag(FOMENUPONTOK[2],3),LEKERDEZESEK, 7);
-						switch (menuP) {
-							case 1: //Lekérdezések/Névsor szerinti lista
-							{
-								lista_nevsor();
-								menuP=99;
-								break;
-							} // Lekérdezések/Névsor szerinti lista case ág
-							case 2: // Lekérdezések/Fizetés szerinti lista
-							{
-								lista_fizetes();
-								menuP=99;
-								break;
-							} // Lekérdezések/Fizetés szerinti lista
-							case 3: //Lekérdezések/Felvitel sorrendje szerinti lista
-							{
-								Kellekek.tajUzenet("Lekérdezések/"+LEKERDEZESEK[2], true);
-								menuP=99;
-								break;
-							} // Lekérdezések/Felvitel sorrendje szerinti lista case ág
-							case 4: //Lekérdezések/lista elemszáma, üres helyek
-							{
-								Kellekek.tajUzenet("Lekérdezések/"+LEKERDEZESEK[3], true);
-								menuP=99;
-								break;
-							} // Lekérdezések/lista elemszáma, üres helyek case ág
-							case 5: //Lekérdezések/Átlagéletkor
-							{
-								Kellekek.tajUzenet("Lekérdezések/"+LEKERDEZESEK[4], true);
-								menuP=99;
-								break;
-							} // Lekérdezések/Átlagéletkor case ág
-							case 6: //Lekérdezések/Átlag fizetés
-							{
-								Kellekek.tajUzenet("Lekérdezések/"+LEKERDEZESEK[5], true);
-								menuP=99;
-								break;
-							} // Lekérdezések/Átlag fizetés case ág
-						}
-					} while (menuP!=0); // FÖMENÜ/Lekérdezések case ág
-					menuP=99;
-					break;
-				} // Főmenü/Karbantartás case ág
-			}
-		}  while (menuP!=0);
+	            menuP=99;
+	            break;
+	         } // Tartalék
+	         }
+	      } while (menuP!=0); // FÖMENÜ/Karbantartás case ág
+	      menuP=99;
+	      break;
+	   } // Főmenü/Karbantartás case ág
+	   case 3: //Fömenü/Lekérdezések 
+	   {
+	      do {
+	         menuP=Kellekek.egyszeruMenu(Kellekek.ballevag(FOMENUPONTOK[2],3),LEKERDEZESEK, 7);
+	         switch (menuP) {
+	         case 1: //Lekérdezések/Névsor szerinti lista
+	         {
+	            lista_nevsor();
+	            menuP=99;
+	            break;
+	         } // Lekérdezések/Névsor szerinti lista case ág
+	         case 2: // Lekérdezések/Fizetés szerinti lista
+	         {
+	            lista_fizetes();
+	            menuP=99;
+	            break;
+	         } // Lekérdezések/Fizetés szerinti lista
+	         case 3: //Lekérdezések/Felvitel sorrendje szerinti lista
+	         {
+	            lista_eredeti();
+	            menuP=99;
+	            break;
+	         } // Lekérdezések/Felvitel sorrendje szerinti lista case ág
+	         case 4: //Lekérdezések/lista elemszáma, üres helyek
+	         {
+	            Kellekek.tajUzenet("Lekérdezések/"+LEKERDEZESEK[3], true);
+	            menuP=99;
+	            break;
+	         } // Lekérdezések/lista elemszáma, üres helyek case ág
+	         case 5: //Lekérdezések/Átlagéletkor
+	         {
+	            Kellekek.tajUzenet("Lekérdezések/"+LEKERDEZESEK[4], true);
+	            menuP=99;
+	            break;
+	         } // Lekérdezések/Átlagéletkor case ág
+	         case 6: //Lekérdezések/Átlag fizetés
+	         {
+	            Kellekek.tajUzenet("Lekérdezések/"+LEKERDEZESEK[5], true);
+	            menuP=99;
+	            break;
+	         } // Lekérdezések/Átlag fizetés case ág
+	         }
+	      } while (menuP!=0); // FÖMENÜ/Lekérdezések case ág
+	      menuP=99;
+	      break;
+	   } // Főmenü/Karbantartás case ág
+	   }
+	}  while (menuP!=0);
 		Kellekek.tajUzenet("PROGRAM VÉGE", false);
 	} //main
 	
@@ -221,7 +222,7 @@ public static void main(String[] args) {
 		
 		akt=nev_elso;
 		System.out.println("START: "+nev_elso);
-		System.out.println("ÜRES :"+ures_elso);
+		System.out.println("ÜRES :"+ures_elso_n);
 		System.out.println();
 		while (akt!=NULL) { //Amíg nem a lista végén vagyunk
 			System.out.print(String.format("%2d",i));
@@ -242,7 +243,7 @@ public static void main(String[] args) {
 		
 		akt=fiz_elso;
 		System.out.println("START: "+fiz_elso);
-		System.out.println("ÜRES :"+ures_elso);
+		System.out.println("ÜRES :"+ures_elso_n);
 		System.out.println();
 		while (akt!=NULL) { //Amíg nem a lista végén vagyunk
 			System.out.print(String.format("%2d",i));
@@ -255,6 +256,26 @@ public static void main(String[] args) {
 			i++;
 			akt=link_fiz[akt]; // Lépés a követő elemre
 		} 
+	}
+	
+	static void lista_eredeti() {
+	   System.out.println();
+	   System.out.println("START NEV: "+nev_elso);
+	   System.out.println("START FIZ: "+fiz_elso);
+      System.out.println("ÜRES NEV :"+ures_elso_n);
+      System.out.println("ÜRES FIZ :"+ures_elso_f);
+      for (int i=0;i<nev.length;i++) {
+         System.out.print(String.format("%2d",i));
+         System.out.print(String.format("  %-20s",nev[i]));
+         System.out.print(String.format("  %-20s",cim[i]));
+         System.out.print(String.format("  %-20s", mhely[i]));
+         System.out.print(String.format("  %-4s", szev[i]));
+         System.out.print(String.format("  %,10.0f Ft",fiz[i]));
+         System.out.print(String.format("  %4s", link_nev[i]));
+         System.out.print(String.format("  %4s", link_fiz[i]));
+         System.out.println();
+      }
+      System.out.println();
 	}
 	
 	public static boolean beszur(String a_nev,String a_cim, String a_mhely, String a_szev, String a_fiz) {
@@ -281,10 +302,10 @@ public static void main(String[] args) {
 			}
 		}
 		//Itt jön a beszúrás a megkeresett helyre 
-		if (ures_elso==NULL) return false; // nincs több üres hely a listán
+		if (ures_elso_n==NULL) return false; // nincs több üres hely a listán
 		else {
-			uj=ures_elso; // az uj helyre tesszuk a beszurandó elemet
-			ures_elso=link_nev[ures_elso]; // A következő szabad hely állítása
+			uj=ures_elso_n; // az uj helyre tesszuk a beszurandó elemet
+			ures_elso_n=link_nev[ures_elso_n]; // A következő szabad hely állítása
 			nev[uj]=a_nev;
 			cim[uj]=a_cim;
 			mhely[uj]=a_mhely;
@@ -299,8 +320,7 @@ public static void main(String[] args) {
 				link_nev[hely]=uj; // Ami mögé beszúrtunk az után jöjjön az új elem
 			}
 		}
-		
-   	hely=NULL;
+		hely=NULL;
    	if (fiz_elso==NULL) hely=NULL; //Ha üres a lista
    	else {// A lista min. 1 elemet tartalmaz
    		if (Double.parseDouble(a_fiz)<fiz[fiz_elso]) hely=NULL;
@@ -319,19 +339,17 @@ public static void main(String[] args) {
    	}
    	
    	//Itt jön a beszúrás a megkeresett helyre 
-   	if (ures_elso==NULL) return false; // nincs több üres hely a listán
-     		else {
-     			uj=ures_elso; // az uj helyre tesszuk a beszurandó elemet
-     			ures_elso=link_fiz[ures_elso]; // A következő szabad hely állítása
-     			if (hely==NULL) { // Ha az elso helyre történt a beszúrás
-     				link_fiz[uj]=fiz_elso; // az új elem az első
-     				fiz_elso=uj; // az új elem az list eleje
-     			}
-     			else {
-     				link_fiz[uj]=link_fiz[hely]; //Az új elem követője
-     				link_fiz[hely]=uj; // Ami mögé beszúrtunk az után jöjjön az új elem
-     			}
-     		}	
+   	uj=ures_elso_f; // az uj helyre tesszuk a beszurandó elemet
+     	ures_elso_f=link_fiz[ures_elso_f]; // A következő szabad hely állítása
+     	if (hely==NULL) { // Ha az elso helyre történt a beszúrás
+     		link_fiz[uj]=fiz_elso; // az új elem az első
+     		fiz_elso=uj; // az új elem az list eleje
+     	}
+     	else {
+     		link_fiz[uj]=link_fiz[hely]; //Az új elem követője
+     		link_fiz[hely]=uj; // Ami mögé beszúrtunk az után jöjjön az új elem
+     	}
+     		
    	
 		return true;
 	} //beszúr metótus
