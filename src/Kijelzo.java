@@ -8,19 +8,24 @@ public class Kijelzo {
 	private char			  tartalom[][]; // A kijelző "tartalma"
 	private int				  aktSor		 = 0, aktOszlop = 0; // A képernyő kurzorának poziciója
 	private int				  kijelzoSor = 0, kijelzoOszlop = 0; // Ennyi sorból és oszlopból áll a kijelző
-	public static final char VS = '\u2500';
-	public static final char BFS = '\u250c';
-	public static final char JFS = '\u2510';
-	public static final char FS = '\u2502';
-	public static final char BAS = '\u2514';
-	public static final char JAS = '\u2518';
-	public static final char BFD = '\u2554';
-	public static final char JFD = '\u2557';
-	public static final char VD = '\u2550';
-	public static final char FD = '\u2551';
-	public static final char BAD = '\u255A';
-	public static final char JAD = '\u255D';
-	public static final char ARNY = '\u2591';
+	public static final char VS = '\u2500'; // vízszintes vonal, szimpla
+	public static final char BFS = '\u250c'; // bal felső sarok, szimpla
+	public static final char JFS = '\u2510'; //jobb felső sarok, szimpla
+	public static final char FS = '\u2502'; // föggőleges vonal, szimpla
+	public static final char BAS = '\u2514'; // bal alsó sarok, szimpla
+	public static final char JAS = '\u2518'; // jobb alsó sarok, szimpla
+	public static final char BFD = '\u2554'; // bal felső sarok, dupla
+	public static final char JFD = '\u2557'; // jobb felső sarok, dupla
+	public static final char VD = '\u2550'; // vizszintes vonal, dupla
+	public static final char FD = '\u2551'; // függőleges vonal, dupla
+	public static final char BAD = '\u255A'; // bal alsó sarok, dupla
+	public static final char JAD = '\u255D'; // jobb alső sarok, dupla
+	public static final char ARNY = '\u2591'; // árnyékolás 
+	public static final char JBEKS = '\u251C'; // jobb bekötő elem -| szimpla
+	public static final char BBEKS = '\u2524'; // bal bekötő elem |- szimpla
+	public static final char KERS = '\u253C'; // szimpla kereszt elem -|- (táblázatba)
+	public static final char ABEKS = '\u2534'; // alsó bekötő elem táblázatba, szimpla
+	public static final char FBEKS = '\u252C'; // felső bekötő elem táblázatba, szimpla
 	
 	public Kijelzo() {
 		
@@ -179,6 +184,39 @@ public class Kijelzo {
 	//Kurzor aktuális oszlopa
 	public int getAktOszlop() {
 		return aktOszlop;
+	}
+	/*Táblázatot rajzol, szimpla vonalakból.
+	 *sor: a táblázat bal felső sarka
+	 *oszlop: a táblázat bal felső sarka
+	 *szelesseg: a táblázat szélessége
+	 *sordb: hány sora legyen a táblázatnak
+	 *oszlopokSz: ebben e tömbben kell megadni melyik oszlopokban legyenek az oszlopelválasztók 
+	 */
+	public void tablazat(int sor, int oszlop, int szelesseg, int sordb, int[] oszlopokSz) {
+		int mSor, mOszlop;
+		
+		//Kurzor pozició mentése
+		mSor = aktSor;
+		mOszlop = aktOszlop;
+		poz(sor,oszlop);
+		keret((sordb*2)+1, szelesseg, 'S', false, ""); // A táblázat külső keretének megrajzolása
+		for (int i=1; i<sordb; i++) { // Megrajzoljuk a táblázat sorait
+			sorRajzol(sor+(i*2), oszlop, szelesseg, VS);
+			irXY(sor+(i*2),oszlop,JBEKS+""); // jobb bekötő elem
+			irXY(sor+(i*2),(oszlop+szelesseg)-1,BBEKS+""); // bal bekötő elem
+		}
+		for (int i=0;i<oszlopokSz.length;i++) { //Megrajzoljuk a táblazat oszlopait
+			oszlopRajzol(oszlop+oszlopokSz[i],sor,FS,(sordb*2));
+			for (int j=1;j<=sordb-1; j++) { // A közbülső kereszt bekötők kirajzolása
+				irXY(sor+(j*2),oszlop+oszlopokSz[i],KERS+"");
+			}
+			irXY(sor,oszlop+oszlopokSz[i],FBEKS+""); // Felső bekötő megrajzolása
+			irXY(sor+(sordb*2),oszlop+oszlopokSz[i],ABEKS+""); // Alsó bekötő megrajzolása
+		}
+		//Kurzor visszaállítása
+		aktSor = mSor;
+		aktOszlop = mOszlop;
+		poz(aktSor, aktOszlop);
 	}
 	
 } //class Kijelzo

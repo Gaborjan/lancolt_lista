@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.text.Collator;
 import java.text.RuleBasedCollator;
+import java.time.LocalDate;
 import java.util.Locale;
 
 import extra.*;
@@ -52,7 +53,6 @@ public class Lista_kezeles {
 	static int[] link_fiz = new int[MAXADAT];
 	static String[] nev = new String[MAXADAT];
 	static String[] cim = new String[MAXADAT];
-	static String[] mhely = new String[MAXADAT];
 	static String[] szev = new String[MAXADAT];
 	static double[] fiz = new double[MAXADAT];
 	static final int NULL=999;
@@ -62,18 +62,27 @@ public class Lista_kezeles {
 	static int fiz_elso = NULL; // A lista üres
 	static int ures_elso_n = 0; // Az első üres hely nésor szerint
 	static int ures_elso_f = 0; // Az első üres hely fizetés szerint
-	
+	static final int[] EREDETISORTABLAZAT = {8,29,50,61,76,89};
+	static final int[] NEVSORTABLAZAT = {21,42,53};
 	
 		
 public static void main(String[] args) {
 	int menuP=0;
-	//Létrehozzunk a mutató tömböket, mindegyiket üres helyekkel feltöltve
+	//Létrehozzunk a mutató tömböket, mindegyiket üres helyekkel feltöltve, illetve a többi tömböt is feltöltjük 
 	for (int i=0;i<MAXADAT-1;i++) {
 		link_nev[i]=i+1;
 		link_fiz[i]=i+1;
 	}
 	link_nev[MAXADAT-1]=NULL;
 	link_fiz[MAXADAT-1]= NULL;
+
+	for (int i=0;i<MAXADAT;i++) {
+		nev[i]="";
+		cim[i]="";
+		szev[i]="";
+		fiz[i]=0;
+	}
+	
 	teszt_adat_betolt();
 	do {
 	   menuP=Kellekek.egyszeruMenu("Főmenü",FOMENUPONTOK, 4);
@@ -171,19 +180,19 @@ public static void main(String[] args) {
 	         } // Lekérdezések/Felvitel sorrendje szerinti lista case ág
 	         case 4: //Lekérdezések/lista elemszáma, üres helyek
 	         {
-	            Kellekek.tajUzenet("Lekérdezések/"+LEKERDEZESEK[3], true);
+	            elemsz_ures_hely();
 	            menuP=99;
 	            break;
 	         } // Lekérdezések/lista elemszáma, üres helyek case ág
 	         case 5: //Lekérdezések/Átlagéletkor
 	         {
-	            Kellekek.tajUzenet("Lekérdezések/"+LEKERDEZESEK[4], true);
+	            atlag_eletkor();
 	            menuP=99;
 	            break;
 	         } // Lekérdezések/Átlagéletkor case ág
 	         case 6: //Lekérdezések/Átlag fizetés
 	         {
-	            Kellekek.tajUzenet("Lekérdezések/"+LEKERDEZESEK[5], true);
+	         	altag_fizetes();
 	            menuP=99;
 	            break;
 	         } // Lekérdezések/Átlag fizetés case ág
@@ -205,7 +214,7 @@ public static void main(String[] args) {
          egySor=fajl.readLine();
          while (egySor!=null) { 
             adatok=egySor.split(";");
-            beszur(adatok[0],adatok[1],adatok[2],adatok[3],adatok[4]);
+            beszur(adatok[0],adatok[1],adatok[2],adatok[3]);
             egySor=fajl.readLine();
          } // while
          fajl.close();
@@ -219,66 +228,136 @@ public static void main(String[] args) {
 	static void lista_nevsor() {
 		int akt; //Aktuális elem mutatója
 		int i=0;
+		int j=4;
+		Kijelzo Screen1= new Kijelzo((elemszam()*2)+4,80);
 		
 		akt=nev_elso;
-		System.out.println("START: "+nev_elso);
-		System.out.println("ÜRES :"+ures_elso_n);
-		System.out.println();
+		Screen1.torol();
+		Screen1.irXY(0, 13, " N É V S O R    S Z E R I N T I    L I S T A");
+		Screen1.tablazat(1, 1, 69, elemszam()+1,NEVSORTABLAZAT);
+		Screen1.irXY(2,10,"NÉV");
+		Screen1.irXY(2,31,"CÍM");
+		Screen1.irXY(2,47,"SZ.ÉV");
+		Screen1.irXY(2,59, "FIZETÉS");
 		while (akt!=NULL) { //Amíg nem a lista végén vagyunk
-			System.out.print(String.format("%2d",i));
-			System.out.print(String.format("  %-20s",nev[akt]));
-			System.out.print(String.format("  %-20s",cim[akt]));
-			System.out.print(String.format("  %-20s", mhely[akt]));
-			System.out.print(String.format("  %-4s", szev[akt]));
-			System.out.print(String.format("  %,10.0f Ft",fiz[akt]));
-			System.out.println();
+			Screen1.irXY(j, 2, Kellekek.jobblevag(nev[akt],20));
+	      Screen1.irXY(j, 23, Kellekek.jobblevag(cim[akt],20));
+	      Screen1.irXY(j, 47, Kellekek.jobblevag(szev[akt],4));
+	      Screen1.irXY(j, 55, String.format("%,10.0f Ft", fiz[akt]));
+			j+=2;
 			i++;
 			akt=link_nev[akt]; // Lépés a követő elemre
 		} 
+		Screen1.kiir();
+		extra.Console.pressEnter();
 	}
 	
 	static void lista_fizetes() {
 		int akt; //Aktuális elem mutatója
-		int i=0;
+		int j=4;
+		Kijelzo Screen1= new Kijelzo((elemszam()*2)+4,80);
 		
 		akt=fiz_elso;
-		System.out.println("START: "+fiz_elso);
-		System.out.println("ÜRES :"+ures_elso_n);
-		System.out.println();
+		Screen1.torol();
+		Screen1.irXY(0, 12, " F I Z E T É S    S Z E R I N T I    L I S T A");
+		Screen1.tablazat(1, 1, 69, elemszam()+1,NEVSORTABLAZAT);
+		Screen1.irXY(2,10,"NÉV");
+		Screen1.irXY(2,31,"CÍM");
+		Screen1.irXY(2,47,"SZ.ÉV");
+		Screen1.irXY(2,59, "FIZETÉS");
 		while (akt!=NULL) { //Amíg nem a lista végén vagyunk
-			System.out.print(String.format("%2d",i));
-			System.out.print(String.format("  %-20s",nev[akt]));
-			System.out.print(String.format("  %-20s",cim[akt]));
-			System.out.print(String.format("  %-20s", mhely[akt]));
-			System.out.print(String.format("  %-4s", szev[akt]));
-			System.out.print(String.format("  %,10.0f Ft",fiz[akt]));
-			System.out.println();
-			i++;
+			Screen1.irXY(j, 2, Kellekek.jobblevag(nev[akt],20));
+	      Screen1.irXY(j, 23, Kellekek.jobblevag(cim[akt],20));
+	      Screen1.irXY(j, 47, Kellekek.jobblevag(szev[akt],4));
+	      Screen1.irXY(j, 55, String.format("%,10.0f Ft", fiz[akt]));
+			j+=2;
 			akt=link_fiz[akt]; // Lépés a követő elemre
 		} 
+		Screen1.kiir();
+		extra.Console.pressEnter();
 	}
 	
 	static void lista_eredeti() {
-	   System.out.println();
-	   System.out.println("START NEV: "+nev_elso);
-	   System.out.println("START FIZ: "+fiz_elso);
-      System.out.println("ÜRES NEV :"+ures_elso_n);
-      System.out.println("ÜRES FIZ :"+ures_elso_f);
-      for (int i=0;i<nev.length;i++) {
-         System.out.print(String.format("%2d",i));
-         System.out.print(String.format("  %-20s",nev[i]));
-         System.out.print(String.format("  %-20s",cim[i]));
-         System.out.print(String.format("  %-20s", mhely[i]));
-         System.out.print(String.format("  %-4s", szev[i]));
-         System.out.print(String.format("  %,10.0f Ft",fiz[i]));
-         System.out.print(String.format("  %4s", link_nev[i]));
-         System.out.print(String.format("  %4s", link_fiz[i]));
-         System.out.println();
+		Kijelzo Screen1= new Kijelzo(30,130);
+		Screen1.torol();
+		Screen1.irXY(0, 32, "F E L V I T E L    S O R R E N D J E    S Z E R I N T I    L I S T A");
+		Screen1.tablazat(1, 15, 103, 13,EREDETISORTABLAZAT);
+		Screen1.irXY(7, 0, "START NÉV : "+ nev_elso);
+		Screen1.irXY(11, 0, "ÜRES NÉV  : "+ ures_elso_n);
+		Screen1.irXY(15, 0, "START FIZ : "+ fiz_elso);
+		Screen1.irXY(19, 0, "ÜRES FIZ  : "+ures_elso_f);
+		Screen1.irXY(2,16,"T.INDEX");
+		Screen1.irXY(2,32,"NÉV");
+		Screen1.irXY(2,53,"CÍM");
+		Screen1.irXY(2, 68,"SZ.ÉV");
+		Screen1.irXY(2, 81, "FIZETÉS");
+		Screen1.irXY(2, 94, "LINK NÉV");
+		Screen1.irXY(2, 106, "LINK FIZ.");
+		for (int i=0,j=4;i<=nev.length-1;i++,j=j+2) {
+         Screen1.irXY(j, 16, String.format("%6d",i));
+         Screen1.irXY(j, 24, Kellekek.jobblevag(nev[i],20));
+         Screen1.irXY(j, 45, Kellekek.jobblevag(cim[i],20));
+         Screen1.irXY(j, 69, Kellekek.jobblevag(szev[i],4));
+         Screen1.irXY(j, 77, String.format("%,10.0f Ft", fiz[i]));
+         Screen1.irXY(j, 98, String.format("%4d", link_nev[i]));
+         Screen1.irXY(j, 111, String.format("%4d", link_fiz[i]));
       }
-      System.out.println();
+		Screen1.kiir();
+		extra.Console.pressEnter();
 	}
 	
-	public static boolean beszur(String a_nev,String a_cim, String a_mhely, String a_szev, String a_fiz) {
+	public static int elemszam() {
+		int db=0; //elemszám számlálója
+		int akt=nev_elso; // aktuális elem mutatója
+		while (akt!=NULL) {
+			db++; // számláló növelése
+			akt=link_nev[akt]; // következő elemre lépés
+		}
+		return db;
+	}
+	
+	public static void elemsz_ures_hely() {
+		if (elemszam()==0) Kellekek.tajUzenet("A lista üres, szabad helyek száma: "+MAXADAT, true);
+		else
+			Kellekek.tajUzenet(" A listában "+elemszam()+ " elem van, az üres helyek száma: "+(MAXADAT-elemszam()), true);
+	}
+	
+	public static void altag_fizetes() {
+		double fizetesek_osszege=0;
+		String atlag="";
+		int akt=fiz_elso; // aktuális elem mutatója
+		if (akt==NULL)
+			Kellekek.tajUzenet("A lista üres, így az átlagfizetés nem értelmezhető.", true);
+		else { 
+			while (akt!=NULL) {
+				fizetesek_osszege+=fiz[akt]; // számláló növelése
+				akt=link_fiz[akt]; // következő elemre lépés
+			}
+			atlag=String.format("%,10.2f Ft", (fizetesek_osszege)/elemszam());
+			Kellekek.tajUzenet("A listában lévő emberek átlagfizetése: "+atlag, true);
+		}
+	}
+	
+	public static void atlag_eletkor() {
+		LocalDate ma = LocalDate.now();
+		int eletKor;
+		double eletKorOssz=0;
+		String atlagEletkor="";
+		int akt=nev_elso;
+		if (akt==NULL)
+			Kellekek.tajUzenet("A lista üres, így az átlagéletkor nem értelmezhető.", true);
+		else
+			while (akt!=NULL) {
+				eletKor=ma.getYear()-Integer.valueOf(szev[akt]);
+				eletKorOssz+=eletKor;
+				akt=link_nev[akt];
+			}
+		atlagEletkor=String.format("%,4.2f év", (eletKorOssz/elemszam()));
+		Kellekek.tajUzenet("A listában lévő emberek átlagéletkora "+atlagEletkor, true);
+
+	}
+	
+	public static boolean beszur(String a_nev,String a_cim, String a_szev, String a_fiz) {
 		int hely; // Annak az elemnek a helye, amely után be kell szúrni az új nevet
 		int akt; // Az aktuális elem mutatója
 		int elozo; // Az aktuálist megelőző elem mutatója
@@ -308,7 +387,6 @@ public static void main(String[] args) {
 			ures_elso_n=link_nev[ures_elso_n]; // A következő szabad hely állítása
 			nev[uj]=a_nev;
 			cim[uj]=a_cim;
-			mhely[uj]=a_mhely;
 			szev[uj]=a_szev;
 			fiz[uj]=Double.parseDouble(a_fiz);
 			if (hely==NULL) { // Ha az elso helyre történt a beszúrás
