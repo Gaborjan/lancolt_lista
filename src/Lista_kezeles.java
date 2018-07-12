@@ -128,8 +128,11 @@ public static void main(String[] args) {
 	         switch (menuP) {
 	         case 1: //Karbantartás/Lista bővítése
 	         {
-	            Kellekek.tajUzenet("Karbantartás/"+KARBANTARTAS[0], true);
-	            menuP=99;
+	            if (elemszam()==MAXADAT) 
+	            	Kellekek.hibaUzenet("A listában nincs több üres hely!", true);
+	         	else 
+	         		lista_bovitese();
+	         	menuP=99;
 	            break;
 	         } // Karbantartás/Lista bővítése case ág
 	         case 2: //Karbantatás/Törlés a listáról
@@ -140,7 +143,10 @@ public static void main(String[] args) {
 	         } // Karbantartás/Lista bővítése case ág
 	         case 3: //Karbantartás/Keresés a listában
 	         {
-	            Kellekek.tajUzenet("Karbantartás/"+KARBANTARTAS[2], true);
+	            if (nev_elso==NULL)
+	            	Kellekek.hibaUzenet("A lista üres!",true);
+	            else
+	            	kereses();
 	            menuP=99;
 	            break;
 	         } // Karbantartás/Keresés a listában
@@ -213,6 +219,7 @@ public static void main(String[] args) {
          RandomAccessFile fajl = new RandomAccessFile(teszt_file_nev,"r");
          egySor=fajl.readLine();
          while (egySor!=null) { 
+         	System.out.println(egySor);
             adatok=egySor.split(";");
             beszur(adatok[0],adatok[1],adatok[2],adatok[3]);
             egySor=fajl.readLine();
@@ -223,6 +230,60 @@ public static void main(String[] args) {
       catch (IOException e ) {
          Kellekek.hibaUzenet("A teszt adatokat tartalmazó fájlt nem sikerült megnyitni!", true);
       }   
+	}
+	
+	static int listan_vane(String knev) {
+		int akt;
+		if (nev_elso==NULL)
+			return NULL;
+		else
+		{
+			akt=nev_elso;
+			while ((akt!=NULL) && (!nev[akt].equals(knev))) 
+				akt=link_nev[akt];
+			if (akt==NULL)
+				return NULL;
+			else 
+				return akt;
+						
+		}
+	}
+	
+	static void kereses() {
+		String knev;
+		int hol;
+		Kijelzo Screen1= new Kijelzo(7,80);
+		do {
+			System.out.println();
+			knev=extra.Console.readLine("Kérem a keresett nevet (Kilépés=0): ");
+			if (!knev.equals("0")) {
+				hol=listan_vane(knev);
+				if (hol==NULL)
+					Kellekek.tajUzenet("Ilyen nevű személy nincs a listában", true);
+				else
+				{
+					Screen1.torol();
+					Screen1.irXY(0, 9, " A    K E R E S E T T    S Z E M É L Y    A D A T A I");
+					Screen1.tablazat(1, 1, 69, 2,NEVSORTABLAZAT);
+					Screen1.irXY(2,10,"NÉV");
+					Screen1.irXY(2,31,"CÍM");
+					Screen1.irXY(2,47,"SZ.ÉV");
+					Screen1.irXY(2,59, "FIZETÉS");
+					Screen1.irXY(4, 2, Kellekek.jobblevag(nev[hol],20));
+					Screen1.irXY(4, 23, Kellekek.jobblevag(cim[hol],20));
+					Screen1.irXY(4, 47, Kellekek.jobblevag(szev[hol],4));
+					Screen1.irXY(4, 55, String.format("%,10.0f Ft", fiz[hol]));
+					Screen1.kiir();
+					extra.Console.pressEnter();
+				}
+			}
+		} while (!knev.equals("0"));
+		
+		
+	}
+	
+	static void lista_bovitese() {
+		
 	}
 	
 	static void lista_nevsor() {
