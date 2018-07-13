@@ -64,6 +64,8 @@ public class Lista_kezeles {
 	static int ures_elso_f = 0; // Az első üres hely fizetés szerint
 	static final int[] EREDETISORTABLAZAT = {8,29,50,61,76,89};
 	static final int[] NEVSORTABLAZAT = {21,42,53};
+	static boolean uresHelyTorolve = true; //A felszabaduló helyen lévő adatokat töröljük-e vagy ne?- > Demonstrációs üzmód
+	static boolean muveletUtanLista = false; //Karbantartó művelet után legyen-e automatikusan lista vagy ne? Demonstrációs üzmód
 	
 		
 public static void main(String[] args) {
@@ -137,7 +139,10 @@ public static void main(String[] args) {
 	         } // Karbantartás/Lista bővítése case ág
 	         case 2: //Karbantatás/Törlés a listáról
 	         {
-	            Kellekek.tajUzenet("Karbantartás/"+KARBANTARTAS[1], true);
+	          if (nev_elso==NULL)
+	         	 Kellekek.hibaUzenet("A lista üres!", true);
+	          else
+	         	 torles_listarol();
 	            menuP=99;
 	            break;
 	         } // Karbantartás/Lista bővítése case ág
@@ -219,7 +224,7 @@ public static void main(String[] args) {
          RandomAccessFile fajl = new RandomAccessFile(teszt_file_nev,"r");
          egySor=fajl.readLine();
          while (egySor!=null) { 
-         	System.out.println(egySor);
+         	//System.out.println(egySor);
             adatok=egySor.split(";");
             beszur(adatok[0],adatok[1],adatok[2],adatok[3]);
             egySor=fajl.readLine();
@@ -283,8 +288,71 @@ public static void main(String[] args) {
 	}
 	
 	static void lista_bovitese() {
+		String uNev;
+		String uCim;
+		String uSzev;
+		int s;
+		double uFiz;
+		boolean kilep=false;
+		int hol;
 		
-	}
+		while (!kilep) {
+			System.out.println();
+			do {
+				uNev=extra.Console.readLine("Kérem az új nevet (Kilépés=0): ");
+				if (uNev.equals("0")) {
+					kilep=true;
+					continue;
+				}
+				else {
+					hol=listan_vane(uNev);
+					if (hol!=NULL)
+						Kellekek.hibaUzenet("Ilyen nevű ember már van a listában!", true);
+					else {
+						uCim=Console.readLine("Kérem a(z) " + uNev+" lakcímét :");
+						s=Kellekek.egesz_Beolvas("Kérem a(z) "+uNev+" születési évét (1900-2018): ", 1900, 2018, "Helytelen adat!");
+						uSzev=Integer.toString(s);
+						s=Kellekek.egesz_Beolvas("Kérem a(z) "+uNev+" fizetését (1-1.000.000): ", 1, 1000000, "Helytelen adat!");
+						uFiz=s;
+						beszur(uNev,uCim, uSzev, Double.toString(uFiz));
+						Kellekek.tajUzenet("Az új személy felvéve a listára.", true);
+						if (elemszam()==MAXADAT) {
+							Kellekek.tajUzenet("FIGYELEM! A lista betelt, nem tud több személyt felvenni.", true);
+							kilep=true;
+						}
+					}
+				}
+			} while (!kilep);
+		} // kulso while
+	} //lista bővítése metódus
+	
+	static void torles_listarol() {
+		String tNev;
+		boolean kilep=false;
+		int hol;
+		char v;
+		
+		System.out.println();
+		do {
+			tNev=extra.Console.readLine("Kérem a törlendő személy nevét (Kilépés=0): ");
+			if (tNev.equals("0")) {
+				kilep=true;
+				continue;
+			}
+			else {
+				hol=listan_vane(tNev);
+				if (hol==NULL)
+					Kellekek.hibaUzenet("Ilyen nevű ember nincs a listában!", true);
+				else {
+					do {
+						v=extra.Console.readChar("Biztos törli? (I/N) ");
+					} while ((Character.toUpperCase(v)!='I') && (Character.toUpperCase(v)!='N'));
+					listarol(tNev);
+					Kellekek.tajUzenet("A(z) "+tNev+" nevű személy törölve lett a listáról.", true);
+				}
+			}
+		} while (!kilep); 
+	} // törlés listaról metódus
 	
 	static void lista_nevsor() {
 		int akt; //Aktuális elem mutatója
@@ -488,9 +556,103 @@ public static void main(String[] args) {
      		link_fiz[uj]=link_fiz[hely]; //Az új elem követője
      		link_fiz[hely]=uj; // Ami mögé beszúrtunk az után jöjjön az új elem
      	}
-     		
-   	
 		return true;
 	} //beszúr metótus
 
+	static boolean listarol(String kit) {
+		int hely; //Az a hely, ahonnan törölni kell
+		int elozo=0; // Annak a helynek az elozoje, amit torolni kell
+		int akt; // aktuális hely
+		int koveto; // aktualis kovetoje
+		double tFiz=fiz[listan_vane(kit)];
+		
+		hely=NULL;
+		if (nev_elso==NULL) {// Ha a lista üres
+			hely=NULL;
+			elozo=NULL;
+			return false;
+		}
+		else { // A lista min. egy elemet tartalmaz
+			if (myCollator.compare(kit, nev[nev_elso])==0) { // A törlendő éppen az első
+				hely=nev_elso; //Az első helyről kell törölni
+				elozo=NULL; // Az első előtt nincs semmi
+			}
+			else { //Nem az első helyen van a törlendő elem
+				akt=nev_elso; // Aktuális legyen az első
+				koveto=link_nev[nev_elso]; // Aktuális követője
+				while ((koveto!=NULL) && (hely==NULL)) {
+					if (myCollator.compare(kit, nev[koveto])==0) { // megvan a keresett elem?
+						hely=koveto; // Innen kell rörölni
+						elozo=akt; // a törlendő hely előzője
+					}
+					akt=koveto; // aktuális állítása
+					koveto=link_nev[koveto]; // következő legyen a kovetkező utáni
+				} //while
+				if ((koveto==NULL) && (hely==NULL)) hely=NULL; //nincs meg a keresett elem
+			}
+			//Itt kezdődik maga a törlés
+			if (hely==NULL) //Ha nincs meg a törlendő elem
+				return false;
+			else 
+			{
+				if (elozo==NULL) // az első a törlendő elem
+					nev_elso=link_nev[nev_elso];
+				else
+					link_nev[elozo]=link_nev[hely]; //törlés
+				link_nev[hely]=ures_elso_n;
+				ures_elso_n=hely;
+				if (uresHelyTorolve) {
+					nev[hely]="";
+					cim[hely]="";
+					szev[hely]="";
+				}
+				
+			}
+		}
+		
+		hely=NULL;
+		if (fiz_elso==NULL) {// Ha a lista üres
+			hely=NULL;
+			elozo=NULL;
+			return false;
+		}
+		else { // A lista min. egy elemet tartalmaz
+			if (tFiz<fiz[fiz_elso]) { // A törlendő éppen az első
+				hely=fiz_elso; //Az első helyről kell törölni
+				elozo=NULL; // Az első előtt nincs semmi
+			}
+			else { //Nem az első helyen van a törlendő elem
+				akt=fiz_elso; // Aktuális legyen az első
+				koveto=link_fiz[fiz_elso]; // Aktuális követője
+				while ((koveto!=NULL) && (hely==NULL)) {
+					if (tFiz==fiz[koveto]) { // megvan a keresett elem?
+						hely=koveto; // Innen kell rörölni
+						elozo=akt; // a törlendő hely előzője
+					}
+					akt=koveto; // aktuális állítása
+					koveto=link_fiz[koveto]; // következő legyen a kovetkező utáni
+				} //while
+				if ((koveto==NULL) && (hely==NULL)) hely=NULL; //nincs meg a keresett elem
+			}
+			//Itt kezdődik maga a törlés
+			if (hely==NULL) //Ha nincs meg a törlendő elem
+				return false;
+			else 
+			{
+				if (elozo==NULL) // az első a törlendő elem
+					fiz_elso=link_fiz[fiz_elso];
+				else
+					link_fiz[elozo]=link_fiz[hely]; //törlés
+				link_fiz[hely]=ures_elso_f;
+				ures_elso_f=hely;
+				
+				if (uresHelyTorolve) {
+					fiz[hely]=0;
+				}
+				
+				return true;
+			}
+		}
+	} // listaról metódus
+	
 } // Lista_kezeles class
