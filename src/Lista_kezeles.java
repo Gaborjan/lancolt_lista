@@ -43,9 +43,9 @@ import extra.*;
 
 public class Lista_kezeles {
 	
-	static final String FOMENUPONTOK[] = {"1. Fájlműveletek, beállítások","2. Karbantartás","3. Lekérdezések","0. Program vége"};
+	static final String FOMENUPONTOK[] = {"1. Fájlműveletek, beállítások","2. Karbantartás, keresés","3. Lekérdezések","0. Program vége"};
 	static final String FAJLMUVELETEK[] = {"1. Tesztadatok betöltése", "2. Lista mentése fájlba","3. Betöltés fájlból listába","4. Demonstrációs üzemmód beállítása","0. FŐMENÜ"};
-	static final String KARBANTARTAS[] = {"1. Lista bővítése","2. Törlés a listából","3. Keresés a listában","0. FŐMENÜ"};
+	static final String KARBANTARTAS[] = {"1. Lista bővítése","2. Törlés a listából","3. Keresés a listában","4. A teljes lista törlése","0. FŐMENÜ"};
 	static final String LEKERDEZESEK[] = {"1. Névsor szerinti lista","2. Fizetés szerinti lista","3. Felvitel sorrendje szerinti lista", "4. Lista elemszáma, üres helyek", 
 				"5. Átlagéletkor","6. Átlagfizetés","0. FŐMENÜ"};
 	static final int MAXADAT=12; // Ennyi adatunk lehet maximum
@@ -64,28 +64,16 @@ public class Lista_kezeles {
 	static int ures_elso_f = 0; // Az első üres hely fizetés szerint
 	static final int[] EREDETISORTABLAZAT = {8,29,50,61,76,89};
 	static final int[] NEVSORTABLAZAT = {21,42,53};
+	static final int[] BEALLITASTABLAZAT = {70};
 	static boolean uresHelyTorolve = true; //A felszabaduló helyen lévő adatokat töröljük-e vagy ne?- > Demonstrációs üzmód
-	static boolean muveletUtanLista = false; //Karbantartó művelet után legyen-e automatikusan lista vagy ne? Demonstrációs üzmód
+	static boolean muveletUtanLista = true; //Karbantartó művelet után legyen-e automatikusan lista vagy ne? Demonstrációs üzmód
 	
 		
 public static void main(String[] args) {
 	int menuP=0;
 	//Létrehozzunk a mutató tömböket, mindegyiket üres helyekkel feltöltve, illetve a többi tömböt is feltöltjük 
-	for (int i=0;i<MAXADAT-1;i++) {
-		link_nev[i]=i+1;
-		link_fiz[i]=i+1;
-	}
-	link_nev[MAXADAT-1]=NULL;
-	link_fiz[MAXADAT-1]= NULL;
-
-	for (int i=0;i<MAXADAT;i++) {
-		nev[i]="";
-		cim[i]="";
-		szev[i]="";
-		fiz[i]=0;
-	}
-	
-	teszt_adat_betolt();
+	teljesListaTorles();
+	//teszt_adat_betolt();
 	do {
 	   menuP=Kellekek.egyszeruMenu("Főmenü",FOMENUPONTOK, 4);
 	   switch (menuP) {
@@ -102,19 +90,22 @@ public static void main(String[] args) {
 	         } // Fájműveletek/Tesztadatok betöltése case ág
 	         case 2: //Fájlműveletek/Lista mentése fájlba
 	         {
-	            Kellekek.tajUzenet("Fájlműveletek/"+FAJLMUVELETEK[1], true);
+	            if (elemszam()==0)
+	               Kellekek.hibaUzenet("A lista üres, nincs mit menteni.", true);
+	            else
+	               lista_mentese_fajlba();
 	            menuP=99;
 	            break;
 	         } // //Fájlműveletek/Lista mentése fájlba case ág
 	         case 3: //Fájlműveletek/Betöltés fájlból listába
 	         {
-	            Kellekek.tajUzenet("Fájlműveletek/"+FAJLMUVELETEK[2], true);
+	            betoltes_fajlbol_listaba();
 	            menuP=99;
 	            break;
 	         } // Fájműveletek/Lista betöltése fájlból case ág
 	         case 4: //Fájlműveletek/Drmonstrációs üzemmód
 	         {
-	            Kellekek.tajUzenet("Fájlműveletek/"+FAJLMUVELETEK[3], true);
+	            beallitasok();
 	            menuP=99;
 	            break;
 	         } // Fájműveletek/Demonstrációs üzemmód case ág
@@ -126,14 +117,15 @@ public static void main(String[] args) {
 	   case 2: 
 	   {
 	      do {
-	         menuP=Kellekek.egyszeruMenu(Kellekek.ballevag(FOMENUPONTOK[1],3),KARBANTARTAS, 4);
+	         menuP=Kellekek.egyszeruMenu(Kellekek.ballevag(FOMENUPONTOK[1],3),KARBANTARTAS, 5);
 	         switch (menuP) {
 	         case 1: //Karbantartás/Lista bővítése
 	         {
 	            if (elemszam()==MAXADAT) 
 	            	Kellekek.hibaUzenet("A listában nincs több üres hely!", true);
-	         	else 
+	         	else { 
 	         		lista_bovitese();
+	         	}
 	         	menuP=99;
 	            break;
 	         } // Karbantartás/Lista bővítése case ág
@@ -141,8 +133,9 @@ public static void main(String[] args) {
 	         {
 	          if (nev_elso==NULL)
 	         	 Kellekek.hibaUzenet("A lista üres!", true);
-	          else
+	          else {
 	         	 torles_listarol();
+	          }
 	            menuP=99;
 	            break;
 	         } // Karbantartás/Lista bővítése case ág
@@ -155,9 +148,20 @@ public static void main(String[] args) {
 	            menuP=99;
 	            break;
 	         } // Karbantartás/Keresés a listában
-	         case 4: //Tartalék
+	         case 4: //Teljes lista törlése
 	         {
-
+	            if (elemszam()>0) {
+	               System.out.println();
+	               Kellekek.tajUzenet("FIGYELEM! A TELJES LISTÁT TÖRÖLNI AKARJA?", false);
+	               if (Kellekek.igenNem("<I>gen/<N>em  : ")) {
+	                  teljesListaTorles();
+	                  Kellekek.tajUzenet("A lista minden eleme törölve lett.", true);
+	               }
+	               else
+	                  Kellekek.tajUzenet("A lista nem került törlésre.", true);
+	            }
+	            else
+	                  Kellekek.tajUzenet("A lista jelenleg is üres.", true);
 	            menuP=99;
 	            break;
 	         } // Tartalék
@@ -216,25 +220,101 @@ public static void main(String[] args) {
 	}  while (menuP!=0);
 		Kellekek.tajUzenet("PROGRAM VÉGE", false);
 	} //main
-	
-	static void teszt_adat_betolt() {
-		String egySor;
-		String adatok[];
-		try {
-         RandomAccessFile fajl = new RandomAccessFile(teszt_file_nev,"r");
+
+   static void lista_mentese_fajlba() {
+      String fNev="";
+      RandomAccessFile fajl;
+      
+      while (!fNev.endsWith("0")) {
+         System.out.println();
+         fNev=extra.Console.readLine("Kérem a fájl nevét, amibe a listát szeretné menteni, kiterjesztést ne adjon meg: (Kilépés=0) ");
+         if (fNev.equals("0"))
+            continue;
+         else {
+            try {
+               fajl= new RandomAccessFile(fNev+".csv","rw");
+               String egySor="";
+               for (int i=0;i<elemszam();i++) {
+                  egySor=egySor+nev[i]+";"+cim[i]+";"+szev[i]+";"+fiz[i]+"\n";
+                  fajl.writeBytes(egySor);
+                  egySor="";
+               }
+               fajl.close();
+               Kellekek.tajUzenet("A lista a(z) "+fNev+".csv fájlba kimentve. Mentett elemek száma: "+elemszam()+" darab.", true);
+               fNev="0";
+            }
+            catch (IOException e) {
+               System.out.println("Hiba történt fájlművelet közben!");
+               extra.Console.pressEnter();
+               fNev="0";
+            }
+         }
+           
+      }
+   }
+   
+   static void teljesListaTorles() {
+      nev_elso = NULL; // A lista üres
+      fiz_elso = NULL; // A lista üres
+      ures_elso_n = 0; // Az első üres hely nésor szerint
+      ures_elso_f = 0; // Az első üres hely fizetés szerint
+      for (int i=0;i<MAXADAT-1;i++) {
+         link_nev[i]=i+1;
+         link_fiz[i]=i+1;
+      }
+      link_nev[MAXADAT-1]=NULL;
+      link_fiz[MAXADAT-1]= NULL;
+
+      for (int i=0;i<MAXADAT;i++) {
+         nev[i]="";
+         cim[i]="";
+         szev[i]="";
+         fiz[i]=0;
+      }
+   }
+   
+   static boolean adat_betolt_fajlbol(String FNev) {
+      String egySor;
+      String adatok[];
+      try {
+         RandomAccessFile fajl = new RandomAccessFile(FNev,"r");
+         teljesListaTorles();
          egySor=fajl.readLine();
          while (egySor!=null) { 
-         	//System.out.println(egySor);
+            //System.out.println(egySor);
             adatok=egySor.split(";");
             beszur(adatok[0],adatok[1],adatok[2],adatok[3]);
             egySor=fajl.readLine();
          } // while
          fajl.close();
-         Kellekek.tajUzenet("Teszt adatok betöltése sikeres!",true);
+         Kellekek.tajUzenet("Adatok betöltése sikeres! (Fájlnév: "+FNev+") Betöltött elemek száma: "+elemszam()+ " darab",true);
+         return true;
       } //try
       catch (IOException e ) {
-         Kellekek.hibaUzenet("A teszt adatokat tartalmazó fájlt nem sikerült megnyitni!", true);
-      }   
+         Kellekek.hibaUzenet("A(z) "+FNev+" fájlt nem sikerült megnyitni!", true);
+         return false;
+      } 
+   }
+   
+	static void teszt_adat_betolt() {
+		teljesListaTorles();
+      if ((adat_betolt_fajlbol(teszt_file_nev)) && (muveletUtanLista)) lista_eredeti();
+	}
+	
+	static void betoltes_fajlbol_listaba() {
+	   String fNev="";
+	   
+	   System.out.println();
+	   if (Kellekek.igenNem("FIGYELEM! A listában lévő adatok felülírásra kerülnek a betölteni kívánt adatokkal. Folytatja? (<I>gen/<N>em) ")) {
+	      fNev=extra.Console.readLine("Kérem a fájl nevét, kiterjesztés nélkül. A fájlnak 'csv' (elválasztó: ';') formátumúnak kell lennie. (Kilépés=0) ");
+	      if (!fNev.equals("0")) {
+            if ((adat_betolt_fajlbol(fNev+".csv")) && (muveletUtanLista)) lista_eredeti();
+	      }
+	      else 
+	         Kellekek.tajUzenet("A betöltés megszakítva.", true);
+	   }
+	   else
+	      Kellekek.tajUzenet("A betöltés megszakítva.", true);
 	}
 	
 	static int listan_vane(String knev) {
@@ -316,6 +396,7 @@ public static void main(String[] args) {
 						uFiz=s;
 						beszur(uNev,uCim, uSzev, Double.toString(uFiz));
 						Kellekek.tajUzenet("Az új személy felvéve a listára.", true);
+						if (muveletUtanLista) lista_eredeti(); 
 						if (elemszam()==MAXADAT) {
 							Kellekek.tajUzenet("FIGYELEM! A lista betelt, nem tud több személyt felvenni.", true);
 							kilep=true;
@@ -349,6 +430,7 @@ public static void main(String[] args) {
 					} while ((Character.toUpperCase(v)!='I') && (Character.toUpperCase(v)!='N'));
 					listarol(tNev);
 					Kellekek.tajUzenet("A(z) "+tNev+" nevű személy törölve lett a listáról.", true);
+					if (muveletUtanLista) lista_eredeti(); 
 				}
 			}
 		} while (!kilep); 
@@ -362,12 +444,16 @@ public static void main(String[] args) {
 		
 		akt=nev_elso;
 		Screen1.torol();
-		Screen1.irXY(0, 13, " N É V S O R    S Z E R I N T I    L I S T A");
 		Screen1.tablazat(1, 1, 69, elemszam()+1,NEVSORTABLAZAT);
-		Screen1.irXY(2,10,"NÉV");
-		Screen1.irXY(2,31,"CÍM");
+		Screen1.kozepIr(0, 1, 70,"N É V S O R    S Z E R I N T I    L I S T A");
+		Screen1.kozepIr(2,1,NEVSORTABLAZAT[0]+1,"NÉV");
+		Screen1.kozepIr(2,NEVSORTABLAZAT[0]+1,NEVSORTABLAZAT[1]+1,"NÉV");
+		Screen1.kozepIr(2,NEVSORTABLAZAT[0]+1,NEVSORTABLAZAT[1]+1,"CÍM");
+		Screen1.kozepIr(2,NEVSORTABLAZAT[1]+1,NEVSORTABLAZAT[2]+1,"SZ.ÉV");
+		Screen1.kozepIr(2,NEVSORTABLAZAT[2]+1,70,"FIZETÉS");
+		/*Screen1.irXY(2,31,"CÍM");
 		Screen1.irXY(2,47,"SZ.ÉV");
-		Screen1.irXY(2,59, "FIZETÉS");
+		Screen1.irXY(2,59, "FIZETÉS");*/
 		while (akt!=NULL) { //Amíg nem a lista végén vagyunk
 			Screen1.irXY(j, 2, Kellekek.jobblevag(nev[akt],20));
 	      Screen1.irXY(j, 23, Kellekek.jobblevag(cim[akt],20));
@@ -475,16 +561,16 @@ public static void main(String[] args) {
 		int akt=nev_elso;
 		if (akt==NULL)
 			Kellekek.tajUzenet("A lista üres, így az átlagéletkor nem értelmezhető.", true);
-		else
+		else {
 			while (akt!=NULL) {
 				eletKor=ma.getYear()-Integer.valueOf(szev[akt]);
 				eletKorOssz+=eletKor;
 				akt=link_nev[akt];
 			}
-		atlagEletkor=String.format("%,4.2f év", (eletKorOssz/elemszam()));
-		Kellekek.tajUzenet("A listában lévő emberek átlagéletkora "+atlagEletkor, true);
-
-	}
+			atlagEletkor=String.format("%,4.2f év", (eletKorOssz/elemszam()));
+			Kellekek.tajUzenet("A listában lévő emberek átlagéletkora "+atlagEletkor, true);
+		}
+	} // atlag_eletkor metódus
 	
 	public static boolean beszur(String a_nev,String a_cim, String a_szev, String a_fiz) {
 		int hely; // Annak az elemnek a helye, amely után be kell szúrni az új nevet
@@ -654,5 +740,33 @@ public static void main(String[] args) {
 			}
 		}
 	} // listaról metódus
+	
+	
+	static void aktualisBeallitasok() {
+	   Kijelzo Screen1= new Kijelzo(7,90);
+	   System.out.println();
+      Screen1.kozepIr(0, 1, 80, "A K T U Á L I S    B E Á L L Í T Á S O K");
+      Screen1.tablazat(1, 1, 80, 2,BEALLITASTABLAZAT);
+      Screen1.irXY(2,2,"Listából törölt elemek adatai is törlésre kerülnek");
+      Screen1.irXY(4,2,"Lista műveletek után a lista aktuális állapotának megjelenítése");
+      if (uresHelyTorolve) 
+         Screen1.kozepIr(2,BEALLITASTABLAZAT[0]+1,80,"IGEN");
+      else
+         Screen1.kozepIr(2,BEALLITASTABLAZAT[0]+1,80,"NEM");
+      if (muveletUtanLista)
+         Screen1.kozepIr(4,BEALLITASTABLAZAT[0]+1,80,"IGEN");
+      else
+         Screen1.kozepIr(4,BEALLITASTABLAZAT[0]+1,80,"NEM");
+      Screen1.kiir();
+	}
+	static void beallitasok() {
+	   aktualisBeallitasok();
+      if (Kellekek.igenNem("Szeretne a beállításokon változtatni? (<I>gen/<N>em)")) {
+         uresHelyTorolve=Kellekek.igenNem("Listából törölt elemek adatai törlésere kerüljenek? <I>gen/<N>em : ");
+         muveletUtanLista=Kellekek.igenNem("Lista műveletek után a lista aktuális állapota megjelenjen? <I>gen/<N>em : ");
+         aktualisBeallitasok();
+         extra.Console.pressEnter();
+      }
+	} // beallitasok
 	
 } // Lista_kezeles class

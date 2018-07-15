@@ -110,6 +110,14 @@ public class Kellekek {
 			case 12: return "December";
 			default: return "Hibás hónapsorszám!";
 		}
+	} // honap metódus
+	
+	public static boolean igenNem(String kerdes) {
+	   char v;
+	   do {
+         v=extra.Console.readChar(kerdes);
+      } while ((Character.toUpperCase(v)!='I') && (Character.toUpperCase(v)!='N'));
+	   return Character.toUpperCase(v)=='I';
 	}
 	
 }

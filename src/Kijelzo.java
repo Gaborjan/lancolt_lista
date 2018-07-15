@@ -96,7 +96,13 @@ public class Kijelzo {
 		aktSor = mSor;
 		aktOszlop = mOszlop;
 	}
-
+	/*A megadott sorba, a bOszlop és jOszlop közé, középre igazítva kiírja a szoveg
+	 * stringet. Ellenőrzést nem végez, hibás adatokkal a kiírás helytelen lesz.
+	 */
+	public void kozepIr(int sor, int bOszlop, int jOszlop, String szoveg) {
+	   irXY(sor,(int) (bOszlop+((((jOszlop-bOszlop)+1)-szoveg.length())/2)),szoveg);
+	}
+	
 	/* Megrajzol egy adott hosszúságú sort, adott karakterből, megadott sor/oszloptól,  megadott hosszban
 	 * a kurzor poziciója nem változik.*/
 	public void sorRajzol(int sor, int oszlop, int hossz, char mibol) {
