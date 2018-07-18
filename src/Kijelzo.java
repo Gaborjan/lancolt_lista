@@ -198,8 +198,9 @@ public class Kijelzo {
 	 *sordb: hány sora legyen a táblázatnak
 	 *oszlopokSz: ebben e tömbben kell megadni melyik oszlopokban legyenek az oszlopelválasztók 
 	 */
-	public void tablazat(int sor, int oszlop, int szelesseg, int sordb, int[] oszlopokSz) {
+	public void tablazat(int sor, int oszlop, int szelesseg, int sordb, int[] oszlopokSz, String[] fejlecek) {
 		int mSor, mOszlop;
+		int bOszlop,jOszlop; // Fejlécek bal és jobb oldala
 		
 		//Kurzor pozició mentése
 		mSor = aktSor;
@@ -219,6 +220,15 @@ public class Kijelzo {
 			irXY(sor,oszlop+oszlopokSz[i],FBEKS+""); // Felső bekötő megrajzolása
 			irXY(sor+(sordb*2),oszlop+oszlopokSz[i],ABEKS+""); // Alsó bekötő megrajzolása
 		}
+		//Fejlécek
+		bOszlop=oszlop;
+		for (int i=0;i<fejlecek.length-1;i++) {
+			jOszlop=oszlop+oszlopokSz[i];
+			kozepIr(sor+1,bOszlop,jOszlop,fejlecek[i]);
+			bOszlop=jOszlop;
+		}	
+		jOszlop=oszlop+szelesseg;
+		kozepIr(sor+1,bOszlop,jOszlop,fejlecek[fejlecek.length-1]);
 		//Kurzor visszaállítása
 		aktSor = mSor;
 		aktOszlop = mOszlop;
